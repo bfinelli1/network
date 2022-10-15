@@ -1,0 +1,12 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+    <h1 style="margin:10px;">All Posts</h1>
+    <div style="margin:20px;border:2px solid rgb(191, 191, 191);">
+    <h2 style="margin:10px;">New Post</h2>
+    <form style="padding-right: 20px;" id="compose-form">
+        <textarea style="margin:10px;resize:none;" class="form-control" id="compose-post" placeholder="Post"></textarea>
+        <input value="Post" style="margin:5px;" type="submit" class="btn btn-primary"/>
+    </form>
+    </div>
+{% endblock %}
