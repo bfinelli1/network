@@ -1,0 +1,58 @@
+{% extends "network/layout.html" %}
+
+
+{% block body %}
+<h1 style="margin:10px;">{{ user }}'s Posts</h1>
+
+<script>
+    // document.addEventListener('DOMContentLoaded', () => {
+
+    //     //load posts
+    //     fetch('/getposts/all')
+    //         .then(response => response.json())
+    //         .then(posts => {
+    //             // Print posts
+    //             console.log(posts);
+    //             posts.forEach(post => {
+    //                 const li = document.createElement('div');
+    //                 li.style.border = "2px solid rgb(191, 191, 191)";
+    //                 li.style.margin = "20px";
+    //                 li.innerHTML = "<span style=\"font-weight: bold;\">&nbsp;" + post.creator + "</span><br>";
+    //                 li.innerHTML += post.post_text + "<br>" + post.date + "<br>" + post.likes + " ❤️";
+
+    //                 li.querySelector('span').addEventListener('click', function () {
+    //                     console.log('clicked on username')
+    //                     location.href="register"
+    //                 })
+
+    //                 // Add new item to task list
+                    
+    //                 document.querySelector('#posts').append(li);
+    //             })
+    //         });
+
+
+    // })
+
+
+
+</script>
+
+
+
+{% for post in posts %}
+        <li style="list-style:none;border:2px solid rgb(191, 191, 191);margin:20px">
+            <span style="font-weight: bold;"">{{ user }}</span>
+            <br>
+            {{ post.post_text }}
+            <br>
+            {{ post.date}}
+            <br>
+            {{ post.likes }} ❤️
+
+
+        </li>
+    {% endfor %}
+
+<ul style="list-style:none;"id="posts"></ul>
+{% endblock %}

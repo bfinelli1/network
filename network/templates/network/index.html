@@ -15,7 +15,7 @@
                     li.style.border = "2px solid rgb(191, 191, 191)";
                     li.style.margin = "20px";
                     li.innerHTML = "<span style=\"font-weight: bold;\">&nbsp;" + post.creator + "</span><br>";
-                    li.innerHTML += post.post_text + "<br>" + post.date;
+                    li.innerHTML += post.post_text + "<br>" + post.date + "<br>" + post.likes + " ❤️";
 
                     // li.addEventListener('click', function () {
                     //     console.log('This element has been clicked!')
@@ -26,7 +26,10 @@
                     // else {
                     //     li.style = ""
                     // }
-
+                    li.querySelector('span').addEventListener('click', function () {
+                        console.log('clicked on username')
+                        location.href=`profile/${post.creator}`
+                    })
 
                     // Add new item to task list
                     document.querySelector('#posts').append(li);
@@ -35,6 +38,8 @@
 
 
     })
+
+
 
 </script>
 

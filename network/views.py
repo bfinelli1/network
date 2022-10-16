@@ -24,6 +24,15 @@ def getpostsall(request):
     posts = posts.order_by("-date")
     return JsonResponse([post.serialize() for post in posts], safe=False)
 
+def profile(request, creator):
+    print(creator)
+    user = User.objects.get(username=creator)
+    posts = Post.objects.filter(creator=user)
+    return render(request, "network/profile.html", {
+                "user": user,
+                "posts": posts
+    })
+
 
 def login_view(request):
     if request.method == "POST":
