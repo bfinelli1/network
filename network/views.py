@@ -3,12 +3,26 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.http import JsonResponse
+import json
 
-from .models import User
+from .models import User, Followers, Comments, Post
 
 
 def index(request):
     return render(request, "network/index.html")
+
+def newpost(request):
+    if request.method == "POST":
+        p = request.POST["post"]
+        mynewpost= Post(creator=request.user, post_text=p)
+        mynewpost.save()
+    return HttpResponseRedirect(reverse("index"))
+
+def getpostsall(request):
+    posts = Post.objects.all()
+    posts = posts.order_by("-date")
+    return JsonResponse([post.serialize() for post in posts], safe=False)
 
 
 def login_view(request):

@@ -1,0 +1,9 @@
+#posts {
+    list-style:none;
+    padding:0px
+  }
+
+  #posts > li {
+    border:thin solid black;
+    padding:2px;
+  }
