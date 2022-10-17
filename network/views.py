@@ -5,6 +5,8 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.http import JsonResponse
 from django.db.models import Count
+from django.contrib.auth.decorators import login_required
+
 
 import json
 
@@ -27,7 +29,6 @@ def getpostsall(request):
     return JsonResponse([post.serialize() for post in posts], safe=False)
 
 def profile(request, creator):
-    print(creator)
     user = User.objects.get(username=creator)
     posts = Post.objects.filter(creator=user)
     #max = bids.objects.filter(listing__id=listing_id).aggregate(Max('bid'))
@@ -41,11 +42,24 @@ def profile(request, creator):
                 "following": following
     })
 
+@login_required(redirect_field_name="", login_url="/login")
+def followingpage(request):
+    user = User.objects.get(username=request.user.username)
+    followers = Followers.objects.filter(follower=request.user).values_list('followee', flat=True)
+    
+    print(followers)
+    users= User.objects.filter(id__in=followers)
+    print(users)
+    posts = Post.objects.filter(creator__in=users)
+
+    return render(request, "network/followingpage.html", {
+        "profile": user,
+        "posts": posts
+    })
+
 def follow(request, user):
-    print("user: " + user)
     tofollow = User.objects.get(username=user)
     myfollower = request.user.username
-    print("this is " + myfollower)
     if Followers.objects.filter(follower=request.user, followee=tofollow).exists():
         print("already exists")
     elif user == myfollower:

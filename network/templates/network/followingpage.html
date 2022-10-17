@@ -1,0 +1,42 @@
+{% extends "network/layout.html" %}
+
+
+{% block body %}
+<h1 style="margin:10px;">{{ profile }}'s Follows</h1>
+<br>
+
+
+<script>
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+
+        document.getElementById('follow').onclick = function() {
+            console.log("follow");
+            location.href="{% url 'follow' profile %}"
+        }
+
+    })
+
+
+
+</script>
+
+
+
+{% for post in posts %}
+        <li style="list-style:none;border:2px solid rgb(191, 191, 191);margin:20px">
+            <span style="font-weight: bold;"">{{ post.creator }}</span>
+            <br>
+            {{ post.post_text }}
+            <br>
+            {{ post.date}}
+            <br>
+            {{ post.likes }} ❤️
+
+
+        </li>
+    {% endfor %}
+
+<ul style="list-style:none;"id="posts"></ul>
+{% endblock %}

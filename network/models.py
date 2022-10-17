@@ -8,6 +8,8 @@ class User(AbstractUser):
 class Followers(models.Model):
     follower = models.ForeignKey(User, on_delete=models.DO_NOTHING, null=True)
     followee = models.ForeignKey(User, on_delete=models.DO_NOTHING, null=True, related_name="user")
+    def __str__(self):
+        return f"followee: {self.followee}, follower: {self.follower}"
 
 class Comments(models.Model):
     comment_text = models.CharField(max_length=256)
