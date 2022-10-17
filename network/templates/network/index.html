@@ -4,7 +4,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
 
-        //load posts
+        //fetch posts
         fetch('/getposts/all')
             .then(response => response.json())
             .then(posts => {
@@ -17,15 +17,7 @@
                     li.innerHTML = "<span style=\"font-weight: bold;\">&nbsp;" + post.creator + "</span><br>";
                     li.innerHTML += post.post_text + "<br>" + post.date + "<br>" + post.likes + " ❤️";
 
-                    // li.addEventListener('click', function () {
-                    //     console.log('This element has been clicked!')
-                    //     load_email(myemail)
-                    // });
-                    // if (myemail.read === true)
-                    //     li.style = "background-color:rgb(216, 215, 215)"
-                    // else {
-                    //     li.style = ""
-                    // }
+
                     li.querySelector('span').addEventListener('click', function () {
                         console.log('clicked on username')
                         location.href=`profile/${post.creator}`

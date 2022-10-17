@@ -4,6 +4,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.http import JsonResponse
+from django.db.models import Count
+
 import json
 
 from .models import User, Followers, Comments, Post
@@ -28,10 +30,31 @@ def profile(request, creator):
     print(creator)
     user = User.objects.get(username=creator)
     posts = Post.objects.filter(creator=user)
+    #max = bids.objects.filter(listing__id=listing_id).aggregate(Max('bid'))
+
+    followers = Followers.objects.filter(followee=user).count()
+    following = Followers.objects.filter(follower=user).count()
     return render(request, "network/profile.html", {
-                "user": user,
-                "posts": posts
+                "profile": user,
+                "posts": posts,
+                "followers": followers,
+                "following": following
     })
+
+def follow(request, user):
+    print("user: " + user)
+    tofollow = User.objects.get(username=user)
+    myfollower = request.user.username
+    print("this is " + myfollower)
+    if Followers.objects.filter(follower=request.user, followee=tofollow).exists():
+        print("already exists")
+    elif user == myfollower:
+        print("they're the same")
+    else:
+        newfollow = Followers(follower=request.user, followee=tofollow)
+        newfollow.save()
+    return HttpResponseRedirect(reverse("profile", args=(user,)))
+    
 
 
 def login_view(request):
