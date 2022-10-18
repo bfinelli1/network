@@ -2,26 +2,42 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
 
+
 class User(AbstractUser):
     pass
 
+
 class Followers(models.Model):
     follower = models.ForeignKey(User, on_delete=models.DO_NOTHING, null=True)
-    followee = models.ForeignKey(User, on_delete=models.DO_NOTHING, null=True, related_name="user")
+    followee = models.ForeignKey(User,
+                                 on_delete=models.DO_NOTHING,
+                                 null=True,
+                                 related_name="user")
+
     def __str__(self):
         return f"followee: {self.followee}, follower: {self.follower}"
 
+
 class Comments(models.Model):
     comment_text = models.CharField(max_length=256)
-    commenter = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="commenter")
-    
+    commenter = models.ForeignKey(User,
+                                  on_delete=models.CASCADE,
+                                  null=True,
+                                  related_name="commenter")
+
 
 class Post(models.Model):
-    creator = models.ForeignKey(User, on_delete=models.DO_NOTHING, null=True, related_name="post")
+    creator = models.ForeignKey(User,
+                                on_delete=models.DO_NOTHING,
+                                null=True,
+                                related_name="post")
     post_text = models.CharField(max_length=256)
-    date = models.DateTimeField(default=timezone.now, verbose_name='date joined')
+    date = models.DateTimeField(default=timezone.now,
+                                verbose_name='date joined')
     likes = models.PositiveIntegerField(default=0)
-    comments = models.ForeignKey(Comments, on_delete=models.DO_NOTHING, null=True)
+    comments = models.ForeignKey(Comments,
+                                 on_delete=models.DO_NOTHING,
+                                 null=True)
 
     def serialize(self):
         return {
@@ -34,6 +50,3 @@ class Post(models.Model):
 
     def __str__(self):
         return f"User: {self.creator.username}, post: {self.post_text}, {self.date}"
-
-
-

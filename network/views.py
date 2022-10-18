@@ -7,68 +7,106 @@ from django.http import JsonResponse
 from django.db.models import Count
 from django.contrib.auth.decorators import login_required
 
-
 import json
 
 from .models import User, Followers, Comments, Post
 
 
 def index(request):
-    return render(request, "network/index.html")
+    posts = Post.objects.all()
+    posts = posts.order_by("-date")
+    name = request.user.username
+    return render(request, "network/index.html", {
+        "posts": posts,
+        "name": name
+    })
+
 
 def newpost(request):
     if request.method == "POST":
         p = request.POST["post"]
-        mynewpost= Post(creator=request.user, post_text=p)
+        mynewpost = Post(creator=request.user, post_text=p)
         mynewpost.save()
     return HttpResponseRedirect(reverse("index"))
+
+
+def update(request, id):
+    print(id)
+    if request.method == "POST":
+        edit = request.POST['edit']
+        post = Post.objects.get(id=id)
+        post.post_text = edit
+        post.save()
+    return HttpResponseRedirect(reverse("index"))
+
 
 def getpostsall(request):
     posts = Post.objects.all()
     posts = posts.order_by("-date")
     return JsonResponse([post.serialize() for post in posts], safe=False)
 
+
 def profile(request, creator):
+    followtext = "Follow"
+    tofollow = User.objects.get(username=creator)
+    myfollower = request.user.username
+    if Followers.objects.filter(follower=request.user,
+                                followee=tofollow).exists():
+        followtext = "Unfollow"
     user = User.objects.get(username=creator)
+    username = request.user.username
     posts = Post.objects.filter(creator=user)
-    #max = bids.objects.filter(listing__id=listing_id).aggregate(Max('bid'))
+    posts = posts.order_by("-date")
+    # max = bids.objects.filter(listing__id=listing_id).aggregate(Max('bid'))
 
     followers = Followers.objects.filter(followee=user).count()
     following = Followers.objects.filter(follower=user).count()
-    return render(request, "network/profile.html", {
-                "profile": user,
-                "posts": posts,
-                "followers": followers,
-                "following": following
-    })
+    return render(
+        request,
+        "network/profile.html",
+        {
+            "username": username,
+            "profile": user,
+            "posts": posts,
+            "followers": followers,
+            "following": following,
+            "followtext": followtext
+        },
+    )
+
 
 @login_required(redirect_field_name="", login_url="/login")
 def followingpage(request):
     user = User.objects.get(username=request.user.username)
-    followers = Followers.objects.filter(follower=request.user).values_list('followee', flat=True)
-    
+    followers = Followers.objects.filter(follower=request.user).values_list(
+        "followee", flat=True)
+
     print(followers)
-    users= User.objects.filter(id__in=followers)
+    users = User.objects.filter(id__in=followers)
     print(users)
     posts = Post.objects.filter(creator__in=users)
+    posts = posts.order_by("-date")
 
     return render(request, "network/followingpage.html", {
         "profile": user,
         "posts": posts
     })
 
+
 def follow(request, user):
     tofollow = User.objects.get(username=user)
     myfollower = request.user.username
-    if Followers.objects.filter(follower=request.user, followee=tofollow).exists():
+    if Followers.objects.filter(follower=request.user,
+                                followee=tofollow).exists():
         print("already exists")
+        Followers.objects.get(follower=request.user,
+                              followee=tofollow).delete()
     elif user == myfollower:
         print("they're the same")
     else:
         newfollow = Followers(follower=request.user, followee=tofollow)
         newfollow.save()
-    return HttpResponseRedirect(reverse("profile", args=(user,)))
-    
+    return HttpResponseRedirect(reverse("profile", args=(user, )))
 
 
 def login_view(request):
@@ -84,9 +122,11 @@ def login_view(request):
             login(request, user)
             return HttpResponseRedirect(reverse("index"))
         else:
-            return render(request, "network/login.html", {
-                "message": "Invalid username and/or password."
-            })
+            return render(
+                request,
+                "network/login.html",
+                {"message": "Invalid username and/or password."},
+            )
     else:
         return render(request, "network/login.html")
 
@@ -105,18 +145,16 @@ def register(request):
         password = request.POST["password"]
         confirmation = request.POST["confirmation"]
         if password != confirmation:
-            return render(request, "network/register.html", {
-                "message": "Passwords must match."
-            })
+            return render(request, "network/register.html",
+                          {"message": "Passwords must match."})
 
         # Attempt to create new user
         try:
             user = User.objects.create_user(username, email, password)
             user.save()
         except IntegrityError:
-            return render(request, "network/register.html", {
-                "message": "Username already taken."
-            })
+            return render(request, "network/register.html",
+                          {"message": "Username already taken."})
         login(request, user)
         return HttpResponseRedirect(reverse("index"))
     else:

@@ -6,16 +6,18 @@
 <br>
 <div>Followers: {{ followers }}</div>
 <div>Following: {{ following }}</div>
-<button  class="btn btn-sm btn-outline-primary" id="follow">Follow</button>
+{% if username != profile.username %}
+<button class="btn btn-sm btn-outline-primary" id="follow">{{followtext}}</button>
+{% endif %}
 
 <script>
 
 
     document.addEventListener('DOMContentLoaded', () => {
 
-        document.getElementById('follow').onclick = function() {
+        document.getElementById('follow').onclick = function () {
             console.log("follow");
-            location.href="{% url 'follow' profile %}"
+            location.href = "{% url 'follow' profile %}"
         }
 
     })
@@ -27,8 +29,8 @@
 
 
 {% for post in posts %}
-        <li style="list-style:none;border:2px solid rgb(191, 191, 191);margin:20px">
-            <span style="font-weight: bold;"">{{ profile }}</span>
+<li style="list-style:none;border:2px solid rgb(191, 191, 191);margin:20px">
+    <span style="font-weight: bold;"">{{ profile }}</span>
             <br>
             {{ post.post_text }}
             <br>
@@ -40,5 +42,5 @@
         </li>
     {% endfor %}
 
-<ul style="list-style:none;"id="posts"></ul>
-{% endblock %}
+<ul style=" list-style:none;"id="posts"></ul>
+        {% endblock %}

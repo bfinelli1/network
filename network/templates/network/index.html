@@ -2,36 +2,18 @@
 
 {% block body %}
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-
-        //fetch posts
-        fetch('/getposts/all')
-            .then(response => response.json())
-            .then(posts => {
-                // Print posts
-                console.log(posts);
-                posts.forEach(post => {
-                    const li = document.createElement('div');
-                    li.style.border = "2px solid rgb(191, 191, 191)";
-                    li.style.margin = "20px";
-                    li.innerHTML = "<span style=\"font-weight: bold;\">&nbsp;" + post.creator + "</span><br>";
-                    li.innerHTML += post.post_text + "<br>" + post.date + "<br>" + post.likes + " ❤️";
+    // document.addEventListener('DOMContentLoaded', () => {
 
 
-                    li.querySelector('span').addEventListener('click', function () {
-                        console.log('clicked on username')
-                        location.href=`profile/${post.creator}`
-                    })
 
-                    // Add new item to task list
-                    document.querySelector('#posts').append(li);
-                })
-            });
+    // })
 
+    function edit(element) {
+        let li = element.parentElement
+        console.log(li.innerHTML);
+        li.querySelector('#edit').style.display = "block";
 
-    })
-
-
+    }
 
 </script>
 
@@ -39,12 +21,42 @@
 <div style="margin:20px;border:2px solid rgb(191, 191, 191);">
     <h2 style="margin:10px;">New Post</h2>
     <form action="{% url 'newpost' %}" method="post" style="padding-right: 20px;" id="compose-form">
-        {% csrf_token %}
+        <div>{% csrf_token %}</div>
         <textarea style="margin:10px;resize:none;" class="form-control" id="compose-post" name="post"
             placeholder="Post"></textarea>
         <input value="Post" style="margin:5px;" type="submit" class="btn btn-primary" />
     </form>
 </div>
 
-<ul style="list-style:none;"id="posts"></ul>
+{% for post in posts %}
+<li style="list-style:none;border:2px solid rgb(191, 191, 191);margin:20px">
+    <a href="{% url 'profile' post.creator.username %}" style="font-weight: bold;color:black;">
+        {{ post.creator.username }}</a>
+    <br>
+    {% if name == post.creator.username %}
+    <div>
+        <div onclick="edit(this)" style="color:rgb(73, 73, 225);">Edit</div>
+        <div id="edit" style="display:none;">
+            <form id="edit-form" class="form" action="{% url 'update' post.id %}" method="post"
+                style="padding-right: 20px;" id="edit-form">
+                <div>{% csrf_token %}</div>
+                <textarea style="margin:10px;resize:none;" class="form-control"
+                    name="edit">{{post.post_text}}</textarea>
+                <input value="Post" style="margin:5px;" type="submit" class="btn btn-primary" />
+        </div>
+    </div>
+    {% endif %}
+
+    </form>
+    <div id="posttext">{{ post.post_text }}</div>
+    <br>
+    {{ post.date}}
+    <br>
+    {{ post.likes }} ❤️
+
+
+</li>
+{% endfor %}
+
+<ul style="list-style:none;" id="posts"></ul>
 {% endblock %}
