@@ -50,3 +50,12 @@ class Post(models.Model):
 
     def __str__(self):
         return f"User: {self.creator.username}, post: {self.post_text}, {self.date}"
+
+
+class Likes(models.Model):
+    user = models.ForeignKey(User,
+                             on_delete=models.DO_NOTHING,
+                             related_name="liker")
+    post = models.ForeignKey(Post,
+                             on_delete=models.DO_NOTHING,
+                             related_name="liked")

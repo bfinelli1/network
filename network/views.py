@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 
 import json
 
-from .models import User, Followers, Comments, Post
+from .models import User, Followers, Comments, Post, Likes
 
 
 def index(request):
@@ -38,12 +38,6 @@ def update(request, id):
         post.post_text = edit
         post.save()
     return HttpResponseRedirect(reverse("index"))
-
-
-def getpostsall(request):
-    posts = Post.objects.all()
-    posts = posts.order_by("-date")
-    return JsonResponse([post.serialize() for post in posts], safe=False)
 
 
 def profile(request, creator):
@@ -107,6 +101,30 @@ def follow(request, user):
         newfollow = Followers(follower=request.user, followee=tofollow)
         newfollow.save()
     return HttpResponseRedirect(reverse("profile", args=(user, )))
+
+
+def getpostsall(request):
+    posts = Post.objects.all()
+    posts = posts.order_by("-date")
+    return JsonResponse([post.serialize() for post in posts], safe=False)
+
+
+@login_required(redirect_field_name="", login_url="/login")
+def like(request, postid):
+    post = Post.objects.get(id=postid)
+    user = request.user
+    if Likes.objects.filter(user=request.user, post=post).exists():
+        Likes.objects.filter(user=request.user, post=post).delete()
+        if post.likes > 0:
+            post.likes = post.likes - 1
+            post.save()
+    else:
+        newlike = Likes(user=request.user, post=post)
+        newlike.save()
+        post.likes = post.likes + 1
+        post.save()
+    # likecount = Likes.objects.filter(id=postid).count()
+    return JsonResponse(post.serialize())
 
 
 def login_view(request):

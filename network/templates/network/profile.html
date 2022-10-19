@@ -22,6 +22,15 @@
 
     })
 
+    function like(element, postid) {
+        id = parseInt(postid)
+        fetch(`/like/${postid}`)
+            .then(response => response.json())
+            .then(post => {
+                element.querySelector('#likecount').innerHTML = post.likes;
+            });
+    }
+
 
 
 </script>
@@ -30,17 +39,21 @@
 
 {% for post in posts %}
 <li style="list-style:none;border:2px solid rgb(191, 191, 191);margin:20px">
-    <span style="font-weight: bold;"">{{ profile }}</span>
-            <br>
-            {{ post.post_text }}
-            <br>
-            {{ post.date}}
-            <br>
-            {{ post.likes }} ❤️
+    <a href="{% url 'profile' post.creator.username %}" style="font-weight: bold;color:black;">
+        {{ post.creator.username }}</a>
+    <br>
 
+    </form>
+    <div id="posttext">{{ post.post_text }}</div>
+    <br>
+    {{ post.date}}
+    <br>
+    <div style="width:40px;" onclick="like(this,`{{post.id}}`);" id="likes">
+        <span id="likecount">{{ post.likes }}</span> ❤️
+    </div>
 
-        </li>
-    {% endfor %}
+</li>
+{% endfor %}
 
-<ul style=" list-style:none;"id="posts"></ul>
-        {% endblock %}
+<ul style=" list-style:none;" id="posts"></ul>
+{% endblock %}

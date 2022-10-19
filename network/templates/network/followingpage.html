@@ -11,12 +11,25 @@
 
     document.addEventListener('DOMContentLoaded', () => {
 
-        document.getElementById('follow').onclick = function() {
+        document.getElementById('follow').onclick = function () {
             console.log("follow");
-            location.href="{% url 'follow' profile %}"
+            location.href = "{% url 'follow' profile %}"
         }
 
+
+
     })
+
+
+
+    function like(element, postid) {
+        id = parseInt(postid)
+        fetch(`/like/${postid}`)
+            .then(response => response.json())
+            .then(post => {
+                element.querySelector('#likecount').innerHTML = post.likes;
+            });
+    }
 
 
 
@@ -25,18 +38,22 @@
 
 
 {% for post in posts %}
-        <li style="list-style:none;border:2px solid rgb(191, 191, 191);margin:20px">
-            <span style="font-weight: bold;"">{{ post.creator }}</span>
-            <br>
-            {{ post.post_text }}
-            <br>
-            {{ post.date}}
-            <br>
-            {{ post.likes }} ❤️
+<li style="list-style:none;border:2px solid rgb(191, 191, 191);margin:20px">
+    <a href="{% url 'profile' post.creator.username %}" style="font-weight: bold;color:black;">
+        {{ post.creator.username }}</a>
+    <br>
 
+    </form>
+    <div id="posttext">{{ post.post_text }}</div>
+    <br>
+    {{ post.date}}
+    <br>
+    <div style="width:40px;" onclick="like(this,`{{post.id}}`);" id="likes">
+        <span id="likecount">{{ post.likes }}</span> ❤️
+    </div>
 
-        </li>
-    {% endfor %}
+</li>
+{% endfor %}
 
-<ul style="list-style:none;"id="posts"></ul>
+<ul style="list-style:none;" id="posts"></ul>
 {% endblock %}

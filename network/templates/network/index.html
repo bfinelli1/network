@@ -2,19 +2,20 @@
 
 {% block body %}
 <script>
-    // document.addEventListener('DOMContentLoaded', () => {
-
-
-
-    // })
-
     function edit(element) {
         let li = element.parentElement
-        console.log(li.innerHTML);
         li.querySelector('#edit').style.display = "block";
 
     }
 
+    function like(element, postid) {
+        id = parseInt(postid)
+        fetch(`/like/${postid}`)
+            .then(response => response.json())
+            .then(post => {
+                element.querySelector('#likecount').innerHTML = post.likes;
+            });
+    }
 </script>
 
 <h1 style="margin:10px;">All Posts</h1>
@@ -52,8 +53,9 @@
     <br>
     {{ post.date}}
     <br>
-    {{ post.likes }} ❤️
-
+    <div style="width:40px;" onclick="like(this,`{{post.id}}`);" id="likes">
+        <span id="likecount">{{ post.likes }}</span> ❤️
+    </div>
 
 </li>
 {% endfor %}
