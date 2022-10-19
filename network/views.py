@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.http import JsonResponse
 from django.db.models import Count
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 
 import json
 
@@ -16,9 +17,16 @@ def index(request):
     posts = Post.objects.all()
     posts = posts.order_by("-date")
     name = request.user.username
+
+    #paginator
+    paginator = Paginator(posts, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     return render(request, "network/index.html", {
         "posts": posts,
-        "name": name
+        "name": name,
+        "page_obj": page_obj
     })
 
 
@@ -53,6 +61,11 @@ def profile(request, creator):
     posts = posts.order_by("-date")
     # max = bids.objects.filter(listing__id=listing_id).aggregate(Max('bid'))
 
+    #paginator
+    paginator = Paginator(posts, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     followers = Followers.objects.filter(followee=user).count()
     following = Followers.objects.filter(follower=user).count()
     return render(
@@ -64,7 +77,8 @@ def profile(request, creator):
             "posts": posts,
             "followers": followers,
             "following": following,
-            "followtext": followtext
+            "followtext": followtext,
+            "page_obj": page_obj
         },
     )
 
@@ -81,9 +95,15 @@ def followingpage(request):
     posts = Post.objects.filter(creator__in=users)
     posts = posts.order_by("-date")
 
+    #paginator
+    paginator = Paginator(posts, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     return render(request, "network/followingpage.html", {
         "profile": user,
-        "posts": posts
+        "posts": posts,
+        "page_obj": page_obj
     })
 
 
